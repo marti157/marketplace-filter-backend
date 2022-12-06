@@ -1,12 +1,20 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
+import connect from './db/conn.js';
+import itemsRouter from './routes/items.route.js';
 
 dotenv.config({ path: './config.env' });
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
+app.use(express.static('public'));
+
+app.use('/items', itemsRouter);
+
+connect();
+
+app.listen(PORT, () => {
+  console.log(`> Server is running on port: ${PORT}`);
 });
