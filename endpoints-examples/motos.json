@@ -1,0 +1,39 @@
+[
+  {
+    "handler": "motos.net",
+    "params": {
+      "pagination": {
+        "page": 1,
+        "size": 10
+      },
+      "sort": {
+        "order": "desc",
+        "term": "relevance"
+      },
+      "filters": {
+        "price": {
+          "from": null,
+          "to": 5000
+        },
+        "categories": {
+          "category1Ids": [
+            3000
+          ]
+        },
+        "provinceIds": [],
+        "vehicles": [
+          {
+            "make": "KAWASAKI",
+            "makeId": 75,
+            "model": "Z 900",
+            "modelId": 0
+          }
+        ],
+        "year": {
+          "from": null,
+          "to": null
+        }
+      }
+    }
+  }
+]

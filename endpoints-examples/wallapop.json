@@ -1,0 +1,19 @@
+[
+  {
+    "handler": "wallapop",
+    "params": {
+      "keywords": "computer",
+      "max_sale_price": 1000,
+      "order_by": "distance"
+    }
+  },
+  {
+    "handler": "wallapop",
+    "params": {
+      "category_ids": 10000,
+      "min_sale_price": 100,
+      "max_sale_price": 2000,
+      "order_by": "newest"
+    }
+  }
+]
