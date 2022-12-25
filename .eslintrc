@@ -10,8 +10,10 @@
     "airbnb-base",
     "prettier"
   ],
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "requireConfigFile": false
   },
   "rules": {
     "import/extensions": 0,
@@ -22,6 +24,5 @@
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "no-underscore-dangle": [2, { "allowAfterThis": true }],
     "spaced-comment": 0
-    
   }
 }

@@ -3,3 +3,4 @@ config.env
 .DS_Store
 public/images
 endpoints/
+public/

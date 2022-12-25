@@ -8,9 +8,18 @@ import { requesters, parsers } from '../endpoints/handlers.js';
 import connect from './db/conn.js';
 
 dotenv.config({ path: './config.env' });
-const { MAX_IMAGES, IMAGE_OUTPUT, MAX_UPDATE_PAGES } = process.env;
+const { WORKER_INTERVAL_MIN, MAX_IMAGES, IMAGE_OUTPUT, MAX_UPDATE_PAGES } = process.env;
 
 const NUM_PAGES = process.argv[2] === 'populate' ? MAX_UPDATE_PAGES : 1;
+
+const logMessage = (msg) => {
+  console.log(`[${new Date().toISOString().replace('T', ' ').substring(0, 19)}] ${msg}`);
+};
+
+const sleep = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 const readEndpoints = () => {
   const fileNames = fs.readdirSync('endpoints').filter((file) => file.match(/\.json$/));
@@ -100,8 +109,6 @@ const main = async (endpoints) => {
       }),
   );
 
-  console.log('New items:', newItems);
-
   let imageQueryPromises;
 
   try {
@@ -109,6 +116,8 @@ const main = async (endpoints) => {
   } catch (err) {
     console.error('Error with db queries:', err);
   }
+
+  logMessage(`New items: ${newItems}`);
 
   /* DOWNLOAD AND STORE IMAGES FOR NEW ITEMS */
   try {
@@ -118,8 +127,23 @@ const main = async (endpoints) => {
   }
 
   await mongoose.connection.close();
-
-  process.exit(1);
 };
 
-main(readEndpoints());
+logMessage('Started worker.');
+
+const loop = async () => {
+  for (;;) {
+    logMessage('Running worker...');
+    // eslint-disable-next-line no-await-in-loop
+    await main(readEndpoints());
+    logMessage('Finished running. Going to sleep.');
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(WORKER_INTERVAL_MIN * 60 * 1000);
+  }
+};
+
+if (process.argv[2] === 'populate') {
+  main(readEndpoints());
+} else {
+  loop();
+}
