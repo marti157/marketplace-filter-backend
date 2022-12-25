@@ -3,20 +3,22 @@ import axios from 'axios';
 export const requesters = {
   'motos.net': (endpoint, promises, numPages) => {
     const motoRequest = (config, resolve, results = []) => {
-      axios(config).then((response) => {
-        results.push(...response.data.items);
+      axios(config)
+        .then((response) => {
+          results.push(...response.data.items);
 
-        if (
-          config.data.pagination.page < response.data.meta.totalPages &&
-          config.data.pagination.page < numPages
-        ) {
-          // eslint-disable-next-line no-param-reassign
-          config.data.pagination.page += 1;
-          motoRequest(config, resolve, results);
-        } else {
-          resolve({ data: results, handler: endpoint.handler });
-        }
-      });
+          if (
+            config.data.pagination.page < response.data.meta.totalPages &&
+            config.data.pagination.page < numPages
+          ) {
+            // eslint-disable-next-line no-param-reassign
+            config.data.pagination.page += 1;
+            motoRequest(config, resolve, results);
+          } else {
+            resolve({ data: results, handler: endpoint.handler });
+          }
+        })
+        .catch((err) => console.log('Motos err:', err.message));
     };
 
     promises.push(
@@ -27,6 +29,7 @@ export const requesters = {
             url: 'https://ms-mt--api-web.spain.advgo.net/search',
             data: endpoint.params,
             headers: { 'x-schibsted-tenant': 'motos', 'Accept-Encoding': null },
+            timeout: 3000,
           },
           resolve,
         );
@@ -36,24 +39,26 @@ export const requesters = {
 
   wallapop: (endpoint, promises, numPages) => {
     const wallapopRequest = (config, resolve, results = []) => {
-      axios(config).then((response) => {
-        results.push(...response.data.search_objects);
+      axios(config)
+        .then((response) => {
+          results.push(...response.data.search_objects);
 
-        if (results.length < numPages * 10 && response.headers['x-nextpage']) {
-          const newParams = new URLSearchParams(response.headers['x-nextpage']);
+          if (results.length < numPages * 10 && response.headers['x-nextpage']) {
+            const newParams = new URLSearchParams(response.headers['x-nextpage']);
 
-          wallapopRequest(
-            {
-              ...config,
-              params: Object.fromEntries(newParams),
-            },
-            resolve,
-            results,
-          );
-        } else {
-          resolve({ data: results, handler: endpoint.handler });
-        }
-      });
+            wallapopRequest(
+              {
+                ...config,
+                params: Object.fromEntries(newParams),
+              },
+              resolve,
+              results,
+            );
+          } else {
+            resolve({ data: results, handler: endpoint.handler });
+          }
+        })
+        .catch((err) => console.log('Wallapop err:', err.message));
     };
 
     promises.push(
@@ -63,6 +68,7 @@ export const requesters = {
             method: 'get',
             url: 'https://api.wallapop.com/api/v3/general/search',
             params: endpoint.params,
+            timeout: 3000,
           },
           resolve,
         );
